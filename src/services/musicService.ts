@@ -113,3 +113,18 @@ export const getAlbumById = async (id: string) => {
 
   return { album, songs: songs || [] }
 }
+
+export const getAllArtists = async () => {
+  const { data, error } = await supabase
+    .from("artists")
+    .select("*")
+    .order("name", {ascending: true})
+
+  if (error) {
+    console.error("Error fetching all artists:", error)
+    return [];
+  }
+
+  return data;
+  
+}
