@@ -80,7 +80,7 @@ export const SongCard = ({ song, songsList }: Props) => {
       <div className="flex flex-col gap-1 px-1">
         <div className="flex items-center justify-between gap-2">
           <h3
-            className={`font-bold text-base tracking-tight truncate transition-colors duration-300 ${isThisSongPlaying ? "text-green-500" : "text-white"}`}
+            className={`font-bold text-base tracking-tight truncate transition-colors duration-300 ${isThisSongPlaying ? "text-green-500" : "text-white"} capitalize`}
           >
             {song.title}
           </h3>
