@@ -13,11 +13,24 @@ import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
+  output: "server",
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        external: ["astro", /^astro\/.*/],
+      },
+    },
+    ssr: {
+      noExternal: ["lucide-react", "nanostores", "@nanostores/react"],
+    },
   },
 
   integrations: [react(), svelte()],
-  adapter: netlify()
+  adapter: netlify(),
+  image: {
+    service: {
+      entrypoint: "astro/assets/services/noop",
+    },
+  },
 });
