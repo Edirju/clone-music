@@ -18,7 +18,12 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       rollupOptions: {
-        external: ["astro", /^astro\/.*/],
+        external: (id) => {
+          if (id.includes("astro/entrypoints") || id.includes("astro/dist")) {
+            return false;
+          }
+          return false;
+        } 
       },
     },
     ssr: {
