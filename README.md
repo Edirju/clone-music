@@ -3,7 +3,6 @@
 **Music Clone Pro** es una plataforma de streaming de música de alto rendimiento construida con una arquitectura moderna de **Islands Architecture** (Astro) y un backend relacional escalable (Supabase). El enfoque principal de este proyecto es demostrar la persistencia de estado en aplicaciones multi-página, optimización de consultas SQL y diseño responsivo de nivel empresarial.
 
 [![Tech Stack](https://img.shields.io/badge/Stack-Astro%20%7C%20React%20%7C%20Supabase%20%7C%20Tailwind-blue)]
-(#)
 
 ## 🚀 Características Principales
 
