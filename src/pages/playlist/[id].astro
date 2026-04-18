@@ -1,0 +1,96 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getSongsByGenre } from "@/services/musicService";
+import { supabase } from "@/lib/supabase";
+import { SongCard } from "@/components/SongCard";
+
+// 1. Obtenemos el género de la URL (ej: /playlist/Rock)
+const { id } = Astro.params;
+
+// Usamos el servicio estandarizado que ya trae el JOIN del artista
+const songs = await getSongsByGenre(id as string);
+
+// 2. Buscamos las canciones que coincidan con ese género
+// const { data: songs, error } = await supabase
+//   .from("songs")
+//   .select("*")
+//   .eq("genre", id);
+
+// if (error) console.error(error);
+
+// 3. Mapeo de Colores por género Gradientes
+const genreColors: Record<string, string> = {
+  Rock: "from-red-900 via-zinc-900 to-zinc-900",
+  Pop: "from-pink-800 via-zinc-900 to-zinc-900",
+  Jazz: "from-amber-900 via-zinc-900 to-zinc-900",
+  Salsa: "from-purple-900 via-zinc-900 to-zinc-900",
+};
+
+// 4. Si el género no esta mapeado, usamos verde por defecto.
+const activeGradient =
+  genreColors[id as string] || "from-green-900 via-zinc-900 to-zinc-900";
+---
+
+<Layout title={`Playlist: ${id}`}>
+  <div
+    class={`relative h-full bg-linear-to-t ${activeGradient} transition-all duration-1000`}
+  >
+    <!-- Capa superior oscura para contrastar los textos -->
+    <div class="absolute inset-0 bg-black/30 pointer-events-none"></div>
+
+    <div class="relative z-10">
+      <!-- Header de la Playlist (Efecto Glass y profundidad) -->
+      <header class="flex flex-col md:flex-row gap-8 px-8 pt-12 pb-6 items-end">
+        <picture
+          class="aspect-square size-48 md:size-52 flex-none shadow-2xl shadow-black/70"
+        >
+          <div
+            class="size-full bg-zinc-800 rounded-lg flex items-center justify-center"
+          >
+            <span class="text-7xl uppercase font-black text-zinc-600"
+              >{id?.charAt(0)}</span
+            >
+          </div>
+        </picture>
+
+        <div class="flex flex-col justify-end">
+          <h2 class="text-xs uppercase font-bold text-zinc-300 tracking-wider">
+            Playlist
+          </h2>
+          <h1
+            class="text-5xl md:text-7xl font-black text-white tracking-tight mt-2 mb-4 text-shadow-[0_0_16px_rgb(0_0_0/.5)]"
+          >
+            {id}
+          </h1>
+          <p class="text-zinc-400 text-sm font-light tracking-tight">
+            Creado para ti •
+            <span class="text-white font-bold"
+              >{songs?.length || 0} canciones</span
+            >
+          </p>
+        </div>
+      </header>
+
+      <main class="p-8">
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+        >
+          {
+            songs?.map((song) => (
+              <SongCard song={song} songsList={songs} client:load />
+            ))
+          }
+        </div>
+
+        {
+          songs?.length === 0 && (
+            <p class="text-zinc-500 italic mt-10">
+              No hay canciones en este género todavía.
+            </p>
+          )
+        }
+      </main>
+    </div>
+    <!-- Header de la Playlist -->
+  </div>
+</Layout>

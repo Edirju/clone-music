@@ -1,0 +1,160 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getArtistById } from "@/services/musicService";
+import { SongCard } from "@/components/SongCard";
+import { SongRow } from "@/components/player/SongRow";
+import { Play } from "lucide-react";
+
+const { id } = Astro.params;
+
+// Validamos que el ID exista antes de pedir datos
+if (!id) return Astro.redirect("/404");
+
+const artistData = await getArtistById(id);
+
+if (!artistData) return Astro.redirect("/404");
+
+const { artist, songs, albums } = artistData;
+
+// Lógica de pluralización para el contador
+const songCount = songs.length;
+const label = songCount === 1 ? "canción" : "canciones";
+---
+
+<Layout title={`${artist.name} - Artista`}>
+  <div class="relative h-full bg-zinc-900">
+    <!-- Header del Artista -->
+    <header
+      class="relative h-[45vh] min-h-87.5 flex items-end p-8 overflow-hidden"
+    >
+      <!-- Imagen de fondo con blur -->
+      <div class="absolute inset-0 z-1">
+        <img
+          src={artist.image_url || "/default-artist.jpg"}
+          class="w-full h-full object-cover blur-sm animate-fade-in-down duration-700"
+          alt={artist.name}
+        />
+        <div
+          class="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-black/20"
+        >
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6 w-full z-10">
+        <img
+          src={artist.image_url || "/default-artist.jpg"}
+          alt={artist.name}
+          class="size-40 md:size-52 rounded-full object-cover shadow-[0_0_16px_rgb(0_0_0/0.25)] border-2 border-white/10"
+        />
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-4">
+            <span class="bg-blue-500 rounded-full p-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="white"
+                ><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                ></path>
+              </svg>
+            </span>
+            <span
+              class="text-xs font-semibold uppercase tracking-widest text-blue-400 text-shadow-[0_0_4px_rgb(0_0_0/.5)</span>]"
+            >
+              Artista verificado
+            </span>
+          </div>
+          <h1
+            class="text-4xl sm:text-5xl md:text-7xl font-black mt-2 text-white tracking-tighter truncate"
+          >
+            {artist.name}
+          </h1>
+          <p class="text-zinc-300 mt-4 font-medium">
+            {songCount}
+            {label} publicadas
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Barra de acciones -->
+    <section class="px-8 py-6 flex items-center gap-6">
+      <button
+        class="bg-green-500 text-black p-4 rounded-full hover:scale-105 transition-transform shadow-lg shadow-green-500/20"
+      >
+        <Play fill="currentColor" size={32} />
+      </button>
+      <button
+        class="border border-zinc-500 text-white px-4 py-1.5 rounded-full font-bold text-sm hover:border-white transition hover:shadow-[0_0_16px_rgb(0,0,0,.25)] hover:bg-green-500/5"
+      >
+        Seguir
+      </button>
+    </section>
+
+    <!-- Contenido -->
+    <main class="px-8 pb-12">
+      <!-- Listado de canciones populares -->
+      <section class="mb-10">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold mb-6">Populares</h2>
+        </div>
+
+        <div class="flex flex-col">
+          <!-- Encabezado de la tabla -->
+          <div class="hidden md:grid grid-cols-[16px_4fr_3fr_auto] gap-4 px-4 py-2 text-xs font-medium text-zinc-400 uppercase tracking-widest border-b border-white/8 mb-2 ">
+            <span class="">#</span>
+            <span>Título</span>
+            <span>Género</span>
+            <span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z"></path><path d="M8 3.25a.75.75 0 01.75.75v3.25H11a.75.75 0 010 1.5H8a.75.75 0 01-.75-.75V4a.75.75 0 01.75-.75z"></path>
+              </svg>
+            </span>
+          </div>
+
+          {
+            songs.map((song, index) => (
+              <SongRow index={index} song={song} songsList={songs} client:load />
+            ))
+          }
+
+        </div>
+        
+        <!-- <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+        >
+          {
+            songs.length > 0 ? (
+              songs.map((song) => (
+                <SongCard song={song} songsList={songs} client:load />
+              ))
+            ) : (
+              <p class="text-zinc-500 italic">
+                No hay canciones en este artista todavía.
+              </p>
+            )
+          }
+        </div> -->
+      </section>
+
+      {
+        albums.length > 0 && (
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold mb-6">Discografía</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6  gap-4">
+              {albums.map((album) => (
+                <a class="bg-zinc-800/30 p-4 rounded-lg hover:bg-zinc-800/60 transition group cursor-pointer" href={`/album/${album.id}`} >
+                  <img
+                    src={album.image_url}
+                    alt={album.title}
+                    class="aspect-square object-cover rounded shadow-lg mb-3"
+                  />
+                  <h3 class="font-semibold text-sm truncate capitalize">{album.title}</h3>
+                  <p class="text-zinc-400 text-xs mt-1">
+                    {album.release_year} • Álbum
+                  </p>
+                </a>
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </main>
+  </div>
+</Layout>

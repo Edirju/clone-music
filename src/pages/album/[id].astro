@@ -1,0 +1,126 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getAlbumById } from "@/services/musicService";
+import { SongRow } from "@/components/player/SongRow";
+import { Play, Clock3, Disc } from "lucide-react";
+
+const { id } = Astro.params;
+const albumData = await getAlbumById(id as string);
+
+if (!albumData) return Astro.redirect("/404");
+
+const { album, songs } = albumData;
+const artist = (album as any).artists;
+---
+
+<Layout title={`${album.title} - ${artist?.name}`}>
+  <section class="relative h-full bg-zinc-900">
+    <!-- Header del Álbum -->
+    <header
+      class="relative h-[45vh] min-h-87.5 flex items-end p-8 overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-800/80 to-zinc-700 z-1"
+      >
+      </div>
+      <div
+        class="flex flex-col md:flex-row items-center md:items-end gap-6 z-10 w-full"
+      >
+        <div
+          class="size-48 md:size-52 flex-none shadow-[0_8px_40px_rgb(0,0,0,.5)]"
+        >
+          {
+            album.image_url ? (
+              <img
+                src={album.image_url}
+                alt={album.title}
+                class="size-full object-cover rounded-sm"
+              />
+            ) : (
+              <div class="size-full bg-zinc-800 flex items-center justify-center text-zinc-500">
+                <Disc size={80} />
+              </div>
+            )
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-bold uppercase text-white hidden md:block">
+            Álbum
+          </span>
+          <h1
+            class="text-4xl md:text-7xl font-black text-white tracking-tighter"
+          >
+            {album.title}
+          </h1>
+
+          <div class="flex items-center gap-2 mt-4">
+            {
+              artist?.image_url && (
+                <img
+                  src={artist.image_url}
+                  alt={artist.name}
+                  class="size-6 md:size-10 rounded-full object-cover"
+                />
+              )
+            }
+            <a
+              href={`/artist/${album.artist_id}`}
+              class="text-white text-sm capitalize font-semibold hover:underline hover:underline-offset-3"
+            >
+              {artist?.name}
+            </a>
+            <span
+              class="text-zinc-300 text-sm font-medium before:content-['•'] before:mr-2 before:text-zinc-500"
+            >
+              {album.release_year}
+            </span>
+            <span
+              class="text-zinc-300 text-sm font-medium before:content-['•'] before:mr-2 before:text-zinc-500"
+            >
+              {songs.length} canciones
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="p-4 md:p-8 pb-20">
+      <!-- Acciones Rápidas -->
+      <div class="flex items-center gap-6 mb-8">
+        <button
+          class="bg-green-500 text-black p-4 rounded-full hover:scale-105 transition shadow-lg"
+        >
+          <Play fill="currentColor" size={24} />
+        </button>
+      </div>
+
+      <!-- Tabla de canciones -->
+      <div class="flex flex-col">
+        <div
+          class="grid grid-cols-[16px_4fr_auto] md:grid-cols-[16px_4fr_3fr_auto] gap-4 px-4 py-2 text-zinc-400 text-xs font-semibold uppercase tracking-widest border-b border-white/8 mb-4"
+        >
+          <span>#</span>
+          <span>Título</span>
+          <span>Artista</span>
+          <span class="flex justify-end"><Clock3 size={16} /></span>
+        </div>
+        {
+          songs.length > 0 ? (
+            songs.map((song, index) => (
+              <SongRow
+                song={song}
+                index={index}
+                songsList={songs}
+                client:load
+              />
+            ))
+          ) : (
+            <p class="p-4 text-zinc-500">Este álbum todavía no tiene canciones.</p>
+          )
+        }
+      </div>
+    </main>
+  </section>
+</Layout>

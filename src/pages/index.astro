@@ -1,17 +1,63 @@
 ---
+import Layout from "@/layouts/Layout.astro";
+import { ChevronRight } from "lucide-react";
+import { getSongs, getUniqueGenres } from "@/services/musicService";
+import { SongCard } from "@/components/SongCard";
+import { Greeting } from "@/components/Greeting";
 
+const songs = await getSongs();
+const genres = await getUniqueGenres();
+
+// Colores aleatorios para los genres
+const colors = [
+  "bg-linear-to-b from-blue-500 via-blue-900 to-blue-900",
+  "bg-linear-to-b from-green-600 via-green-900 to-green-900",
+  "bg-linear-to-b from-red-600 via-red-900 to-red-900",
+  "bg-linear-to-b from-purple-600 via-purple-900 to-purple-900",
+  "bg-linear-to-b from-pink-600 via-pink-900 to-pink-900",
+  "bg-linear-to-b from-yellow-600 via-yellow-900 to-yellow-900",
+  "bg-linear-to-b from-orange-600 via-orange-900 to-orange-900",
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Music Clone Pro - Bienvenidos">
+  <div
+    class="p-6 transition-all duration-1000 bg-linear-to-b from-green-700/65 via-zinc-900/65 to-zinc-900"
+  >
+    <Greeting client:load />
+    <!-- Sección de géneros -->
+    <section class="mb-8">
+      <h2 class="text-xl font-medium tracking-tighter mb-4">
+        Navegar por géneros
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {
+          genres.map((genre, index) => (
+            <a
+              href={`/playlist/${genre}`}
+              class={`flex items-center justify-between p-4 rounded-lg hover:scale-[1.02] transition-transform shadow-lg ${colors[index % colors.length]}`}
+            >
+              <span class="text-xl font-bold text-white">{genre}</span>
+              <div class="bg-black/20 p-2 rounded-full shadow-inner">
+                <ChevronRight className="text-white size-6" />
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+    <!-- Sección de canciones -->
+    <section class="">
+      <h2 class="text-xl font-bold tracking-tighter mb-4">Hecho para tí</h2>
+      <div
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8"
+      >
+        {
+          songs.map((song) => (
+            <SongCard song={song} songsList={songs} client:load />
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>

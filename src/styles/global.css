@@ -1,0 +1,63 @@
+@import "tailwindcss";
+@import 'tailwind-animations';
+@import '@fontsource-variable/inter/wght.css';
+
+:root {
+  --font-inter: 'Inter Variable', sans-serif;
+}
+
+@theme {
+  --font-inter: 'Inter Variable', sans-serif;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+#app {
+  height: 100dvh;
+}
+
+@keyframes bounce {
+  10% {
+      height: 30%;
+    }
+  
+    30% {
+      height: 100%;
+    }
+  
+    60% {
+      height: 50%;
+    }
+  
+    80% {
+      height: 90%;
+    }
+  
+    100% {
+      height: 60%;
+    }
+}
+
+.playing-bar {
+  width: 3px;
+  height: 100%;
+  background-color: #22c55e;
+  animation: bounce 1s ease-in-out infinite;
+}

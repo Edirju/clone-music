@@ -1,0 +1,90 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getSongs } from "@/services/musicService";
+import { SongRow } from "@/components/player/SongRow";
+import { Heart } from "lucide-react";
+import { LikedSongsList } from "@/components/LikedSongsList";
+
+const allSongs = await getSongs();
+---
+
+<Layout title="Música Favorita: Canciones que te gustan">
+  <section class="relative h-full bg-zinc-900 overflow-x-hidden">
+    <!-- Header Estilo Spotify -->
+    <header
+      class="relative h-[45vh] min-h-87.5 flex items-end p-8 overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-linear-to-t from-zinc-900 via-purple-900 to-purple-600 z-1"
+      >
+      </div>
+
+      <div
+        class="flex flex-col md:flex-row items-center md:items-end gap-6 z-10 w-full"
+      >
+        <div
+          class="size-40 md:size-52 bg-linear-to-br from-indigo-700 to-emerald-400 flex items-center justify-center rounded-lg shadow-2xl flex-none"
+        >
+          <Heart size={80} fill="currentColor" className="text-white" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-bold uppercase text-white hidden md:block"
+            >Playlist</span
+          >
+          <h1
+            class="text-4xl md:text-6xl font-black text-white tracking-tighter"
+          >
+            Canciones que te gustan
+          </h1>
+          <div class="flex items-center gap-2 mt-4">
+            <img
+              src="https://via.placeholder.com/24"
+              class="rounded-full size-6"
+              alt="User"
+            />
+            <span class="text-white text-sm font-bold">Tu Usuario</span>
+            <span
+              class="text-zinc-300 text-sm font-medium after:content-['•'] after:mx-2 after:text-zinc-500"
+            >
+              Colección privada
+            </span>
+            <span
+              id="liked-count-header"
+              class="text-zinc-300 text-sm font-medium"
+            >
+              0 canciones
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="p-4 md:p-8 pb-12">
+      <div id="liked-songs-container" class="mb-10">
+        <LikedSongsList client:load />
+      </div>
+    </main>
+  </section>
+</Layout>
+
+<script>
+  import { favoritesStore } from "@/store/favoritesStore";
+
+  // Actualiza texto contador
+  const updateCount = (ids: readonly string[]) => {
+    const countElement = document.getElementById("liked-count-header");
+    if (countElement) {
+      const count = ids.length;
+      const label = count === 1 ? "canción" : "canciones";
+      countElement.innerText = `${count} ${label}`;
+    }
+  };
+
+  // Suscribirse a los cambios del store
+  favoritesStore.subscribe((ids: readonly string[]) => {
+    updateCount(ids);
+  });
+
+  // Ejecución inicial por si ya hay datos
+  updateCount(favoritesStore.get());
+</script>
